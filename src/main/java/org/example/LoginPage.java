@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.net.MalformedURLException;
 
 
 public class LoginPage {
@@ -37,19 +38,52 @@ public class LoginPage {
         driver.quit();
     }
     @Test
-    public void validTest() {
+    public void loginTest01() {
         driver.findElement(username).sendKeys("standard_user");
         driver.findElement(password).sendKeys("secret_sauce");
         driver.findElement(login_btn).click();
+        Assert.assertEquals(driver.getCurrentUrl(), "https://www.saucedemo.com/inventory.html");
     }
 
     @Test
-    public void invalidTest() {
-        driver.findElement(username).sendKeys("standard_user_wrong");
+    public void loginTest02() {
+        driver.findElement(username).sendKeys("wrong_username");
         driver.findElement(password).sendKeys("secret_sauce");
         driver.findElement(login_btn).click();
-        String errorMessage = driver.findElement(error).getText();
-        Assert.assertEquals("Epic sadface: Username and password do not match any user in this service", errorMessage);
+        Assert.assertTrue(driver.getPageSource().contains("Username and password do not match any user in this service"));
     }
+
+    @Test
+    public void loginTest03() {
+        driver.findElement(username).sendKeys("standard_user");
+        driver.findElement(password).sendKeys("wrong_password");
+        driver.findElement(login_btn).click();
+        Assert.assertTrue(driver.getPageSource().contains("Username and password do not match any user in this service"));
+    }
+
+    @Test
+    public void loginTest04() {
+        driver.findElement(username).sendKeys("");
+        driver.findElement(password).sendKeys("wrong_password");
+        driver.findElement(login_btn).click();
+        Assert.assertTrue(driver.getPageSource().contains("Username is required"));
+    }
+
+    @Test
+    public void loginTest05() {
+        driver.findElement(username).sendKeys("standard_user");
+        driver.findElement(password).sendKeys("");
+        driver.findElement(login_btn).click();
+        Assert.assertTrue(driver.getPageSource().contains("Password is required"));
+    }
+
+    @Test
+    public void loginTest06() {
+        driver.findElement(username).sendKeys("");
+        driver.findElement(password).sendKeys("");
+        driver.findElement(login_btn).click();
+        Assert.assertTrue(driver.getPageSource().contains("Username is required"));
+    }
+
 
 }
