@@ -29,7 +29,7 @@ public class LoginPage {
 
     @Before
     public void setUp() {
-        driver = new ChromeDriver();
+        driver =  new ChromeDriver();
         driver.get("https://www.saucedemo.com/");
     }
 

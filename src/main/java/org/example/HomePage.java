@@ -1,18 +1,29 @@
 package org.example;
 
+import org.checkerframework.checker.units.qual.C;
 import org.junit.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v85.emulation.Emulation;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.Select;
 
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class HomePage {
-    static WebDriver driver;
+    WebDriver driver;
 
     static By addProductButton = By.className("btn_inventory");
     static By productCount = By.xpath("//*[@id=\"shopping_cart_container\"]/a/span");
@@ -31,8 +42,11 @@ public class HomePage {
     static By zipCode = By.xpath("//*[@id=\"postal-code\"]");
     static By continueButton = By.xpath("//*[@id=\"continue\"]");
     static By finishButton = By.xpath("//*[@id=\"finish\"]");
+
+    static By errorMessage = By.xpath("//*[@id=\"checkout_info_container\"]/div/form/div[1]/div[4]/h3");
     @Before
     public void setUp() {
+
         driver = new ChromeDriver();
         driver.get("https://www.saucedemo.com/");
         driver.findElement(LoginPage.username).sendKeys("standard_user");
@@ -107,11 +121,51 @@ public class HomePage {
         driver.findElement(addProductButton).click();
         driver.findElement(cart).click();
         driver.findElement(checkoutButton).click();
-        driver.findElement(firstName).sendKeys("test_first_name");
-        driver.findElement(lastName).sendKeys("test_last_name");
+        driver.findElement(firstName).sendKeys("fname");
+        driver.findElement(lastName).sendKeys("lname");
         driver.findElement(zipCode).sendKeys("100000");
         driver.findElement(continueButton).click();
         driver.findElement(finishButton).click();
         Assert.assertEquals(driver.getCurrentUrl(), "https://www.saucedemo.com/checkout-complete.html");
     }
+
+    @Test
+    public void checkOutTest02() {
+        driver.findElement(addProductButton).click();
+        driver.findElement(cart).click();
+        driver.findElement(checkoutButton).click();
+        driver.findElement(firstName).sendKeys("");
+        driver.findElement(lastName).sendKeys("lname");
+        driver.findElement(zipCode).sendKeys("100000");
+        driver.findElement(continueButton).click();
+        String errorText = driver.findElement(errorMessage).getText();
+        Assert.assertEquals(errorText, "Error: First Name is required");
+    }
+
+    @Test
+    public void checkOutTest03() {
+        driver.findElement(addProductButton).click();
+        driver.findElement(cart).click();
+        driver.findElement(checkoutButton).click();
+        driver.findElement(firstName).sendKeys("fname");
+        driver.findElement(lastName).sendKeys("");
+        driver.findElement(zipCode).sendKeys("100000");
+        driver.findElement(continueButton).click();
+        String errorText = driver.findElement(errorMessage).getText();
+        Assert.assertEquals(errorText, "Error: Last Name is required");
+    }
+
+    @Test
+    public void checkOutTest04() {
+        driver.findElement(addProductButton).click();
+        driver.findElement(cart).click();
+        driver.findElement(checkoutButton).click();
+        driver.findElement(firstName).sendKeys("fname");
+        driver.findElement(lastName).sendKeys("lname");
+        driver.findElement(zipCode).sendKeys("");
+        driver.findElement(continueButton).click();
+        String errorText = driver.findElement(errorMessage).getText();
+        Assert.assertEquals(errorText, "Error: Postal Code is required");
+    }
+
 }
